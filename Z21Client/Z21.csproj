@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
@@ -13,11 +13,21 @@
     <RepositoryUrl>https://github.com/Jakob-Eichberger/z21Client</RepositoryUrl>
     <PackageTags>z21;Roco;Fleischman</PackageTags>
     <Configurations>Debug</Configurations>
-    <VersionPrefix>2.0.0</VersionPrefix>
+    <VersionPrefix>4.0.0</VersionPrefix>
+    <Platforms>x64</Platforms>
+    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Serilog" Version="2.12.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="LICENSE">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>

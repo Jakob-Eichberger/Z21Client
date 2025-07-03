@@ -24,12 +24,14 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
+using System.Windows.Markup;
 using Z21.Enums;
 using Z21.Events;
 using Z21.Model;
 
 namespace Z21
 {
+
     public sealed class Client
     {
         public const int maxDccStep = 127;
@@ -63,10 +65,6 @@ namespace Z21
             }
         }
 
-        public Client()
-        {
-        }
-
         public event EventHandler<FirmwareVersionInfoEventArgs> OnGetFirmwareVersion = default!;
 
         public event EventHandler<HardwareInfoEventArgs> OnGetHardwareInfo = default!;
@@ -91,10 +89,7 @@ namespace Z21
 
         public event EventHandler<bool> ClientReachabilityChanged = default!;
 
-        /// <summary>
-        /// Underlying udp client which facilitates the communication with the z21.
-        /// </summary>
-        private UdpClient UdpClient { get; } = new(port);
+        private IZ21Communicator Z21Communicator { get; } = new Z21Communicator(port);
 
         public IPAddress Address { get; private set; } = default!;
 
@@ -121,30 +116,29 @@ namespace Z21
             if (OperatingSystem.IsWindows())
             {
                 Log.Logger.Information("Z21 Client: Allowing NAT traversal");
-                UdpClient.AllowNatTraversal(true);
+                Z21Communicator.AllowNatTraversal(true);
             }
             Address = clientIp;
-
-            UdpClient.Connect(Address, port);
+            Z21Communicator.Connect(Address, port);
             IsConnected = true;
             Log.Logger.Information($"UPD connection to {Address}:{port} established.");
 
-            UdpClient.BeginReceive(new AsyncCallback(Receiving), null);
+            Z21Communicator.BeginReceive(new AsyncCallback(Receiving), default!);
 
             RenewClientSubscription.Elapsed += (a, b) => GetStatus();
             PingClient.Elapsed += PingClient_Elapsed;
-
             PingClient.Enabled = true;
             _ = Task.Run(async () => ClientReachable = await PingAsync());
+
             Log.Logger.Information($"Z21 client initialised.");
         }
 
         public void Dispose()
         {
             LogOFF();
-            UdpClient.Close();
+            Z21Communicator.Close();
             IsConnected = false;
-            UdpClient.Dispose();
+            Z21Communicator.Dispose();
         }
 
         public void GetFirmwareVersion()
@@ -278,7 +272,7 @@ namespace Z21
             return result.Status == System.Net.NetworkInformation.IPStatus.Success;
         }
 
-        private async void PingClient_Elapsed(object sender, ElapsedEventArgs e)
+        private async void PingClient_Elapsed(object? sender, ElapsedEventArgs e)
         {
             PingClient.Enabled = false;
             try
@@ -487,8 +481,8 @@ namespace Z21
             try
             {
                 IPEndPoint RemoteIpEndPoint = null!;
-                byte[] received = UdpClient.EndReceive(res, ref RemoteIpEndPoint!);
-                UdpClient.BeginReceive(new AsyncCallback(Receiving), null);
+                byte[] received = Z21Communicator.EndReceive(res, ref RemoteIpEndPoint!);
+                Z21Communicator.BeginReceive(new AsyncCallback(Receiving), null);
                 OnReceive?.Invoke(this, new DataEventArgs(received));
                 Log.Logger.ForContext("data", received).Debug($"Received data from the z21: {BitConverter.ToString(received)}");
                 CutTelegramm(received);
@@ -666,8 +660,8 @@ namespace Z21
 
         private async void Sending(byte[] bytes)
         {
-            await UdpClient.SendAsync(bytes, bytes?.GetLength(0) ?? 0);
-            Log.Logger.ForContext("data", bytes).Debug($"Sending data to the z21: {BitConverter.ToString(bytes)}");
+            await Z21Communicator.SendAsync(bytes ?? [], bytes?.GetLength(0) ?? 0);
+            Log.Logger.ForContext("data", bytes).Debug($"Sending data to the z21: {BitConverter.ToString(bytes ?? [])}");
         }
     }
 }
