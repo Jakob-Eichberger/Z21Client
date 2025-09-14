@@ -1,6 +1,8 @@
+# ⚠️ This repository is archived and no longer maintained. Please visit the actively developed version [here](https://github.com/Jakob-Eichberger/Z21).⚠️
+
 # Z21 [![](https://github.com/Jakob-Eichberger/z21Client/actions/workflows/dotnet.yml/badge.svg?branch=master)](https://github.com/Jakob-Eichberger/z21Client/actions/workflows/dotnet.yml)
 
-The **Z21 client** library is a C# library for interfacing with the Roco and Fleischmann [Z21 Digital Command Center (DCC)](https://www.z21.eu/). It allows you to control trains, functions, and eventually signals/switches using the Z21 protocol. The library is available as a [NuGet package](https://www.nuget.org/packages/Z21/) for easy integration into your project.
+The **Z21 client** library is a C# library for interfacing with the Roco and Fleischmann [Z21 Digital Command Center (DCC)](https://www.z21.eu/). It allows you to control trains, functions, and eventually signals/switches using the Z21 protocol.
 
 ## Features
 
@@ -58,3 +60,4 @@ Contributions are welcome! If you encounter any issues or have suggestions, plea
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
+
